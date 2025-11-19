@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML & CSS: Retro Systems (Interactive)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+/* 1. THE SETUP & THEME */
+:root {
+    --bg-color: #050505;
+    --text-color: #E0E0E0;
+    --accent-primary: #FF00FF; /* Neon Pink */
+    --accent-secondary: #FFFF00; /* Neon Yellow */
+    --accent-tertiary: #00FFFF; /* Cyan */
+    --accent-error: #FF3333; /* Red */
+    --border-width: 4px;
+    --grid-color: #222;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    background-color: #111;
+    background-image: 
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 40px 40px;
+    margin: 0;
+    padding: 0;
+    font-family: 'Space Mono', monospace;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden; /* Prevent scrolling */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 2. SLIDE CONTAINER (INTERACTIVE MODE) */
+.deck-container {
+    width: 1280px;
+    height: 720px;
+    position: relative;
+}
+
+.slide-container {
+    /* Default State: Hidden */
+    display: none; 
+    
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-color);
+    border: var(--border-width) solid var(--accent-primary);
+    box-shadow: 15px 15px 0px var(--accent-tertiary);
+    color: var(--text-color);
+    padding: 60px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Active State: Visible */
+.slide-container.active {
+    display: flex;
+    animation: glitch-in 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes glitch-in {
+    0% { opacity: 0; transform: scale(0.98); filter: hue-rotate(90deg); }
+    100% { opacity: 1; transform: scale(1); filter: hue-rotate(0deg); }
+}
+
+/* 3. DECORATIVE & TYPOGRAPHY */
+.slide-container::before {
+    content: ''; position: absolute; top: 15px; left: 15px;
+    width: 25px; height: 25px;
+    border-top: 4px solid var(--accent-secondary);
+    border-left: 4px solid var(--accent-secondary);
+}
+.slide-container::after {
+    content: ''; position: absolute; bottom: 15px; right: 15px;
+    width: 25px; height: 25px;
+    border-bottom: 4px solid var(--accent-secondary);
+    border-right: 4px solid var(--accent-secondary);
+}
+
+h1 {
+    font-size: 80px; margin: 0 0 20px 0; line-height: 0.9;
+    text-transform: uppercase; letter-spacing: -4px;
+    text-shadow: 4px 4px 0px var(--accent-primary);
+}
+
+h2.slide-title {
+    font-size: 48px; color: #000;
+    background-color: var(--accent-secondary);
+    padding: 10px 20px; display: inline-block;
+    margin-bottom: 40px; transform: skewX(-10deg);
+    border: 2px solid #000;
+}
+
+h3 {
+    color: var(--accent-tertiary); font-size: 32px;
+    margin-bottom: 20px; text-transform: uppercase;
+    text-decoration: underline; text-decoration-style: wavy;
+}
+
+p, li { font-size: 20px; line-height: 1.6; color: #CCC; margin-bottom: 10px; }
+
+/* 4. COMPONENTS & LAYOUTS */
+.two-column {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 50px;
+    width: 100%; align-items: center;
+}
+
+.image-wrapper {
+    border: 4px solid #FFF; height: 350px; overflow: hidden; position: relative;
+    filter: grayscale(100%) contrast(120%) sepia(20%);
+}
+.image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+/* Glitch overlay for images */
+.image-wrapper::after {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 2px, transparent 2px, transparent 4px);
+    pointer-events: none;
+}
+
+.terminal {
+    background: #000; border: 2px solid #333; padding: 20px;
+    font-family: 'Space Mono', monospace; color: #0F0;
+    box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.1);
+}
+.terminal-line { display: block; margin-bottom: 8px; }
+.tag { color: var(--accent-primary); }
+.attr { color: var(--accent-tertiary); }
+.val { color: var(--accent-secondary); }
+
+.tiled-content { display: flex; gap: 20px; width: 100%; }
+.tile {
+    border: 2px solid var(--accent-tertiary); padding: 25px;
+    flex: 1; background: rgba(0, 255, 255, 0.05);
+}
+.tile .icon { font-size: 40px; color: var(--accent-secondary); margin-bottom: 15px; }
+
+.table-layout table { width: 100%; border-collapse: collapse; border: 4px solid #FFF; }
+.table-layout th { background-color: var(--accent-primary); color: #000; padding: 15px; font-size: 24px; border: 2px solid #FFF; }
+.table-layout td { border: 2px solid #555; padding: 15px; color: var(--accent-tertiary); }
+
+.full-bg-image { background-size: cover; background-position: center; align-items: center; justify-content: center; }
+.overlay-box { background: rgba(0,0,0,0.9); border: 4px solid var(--accent-primary); padding: 40px; text-align: center; box-shadow: 10px 10px 0 var(--accent-secondary); }
+
+.section-break { text-align: center; width: 100%; }
+.section-break hr { border: 0; height: 4px; background: var(--accent-primary); margin: 40px auto; width: 150px; box-shadow: 4px 4px 0 var(--accent-secondary); }
+
+/* 5. NAVIGATION UI */
+.nav-controls {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    gap: 15px;
+    z-index: 1000;
+}
+
+.nav-btn {
+    background: #000;
+    border: 2px solid var(--accent-primary);
+    color: var(--accent-primary);
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 4px 4px 0 var(--accent-tertiary);
+}
+
+.nav-btn:hover {
+    background: var(--accent-primary);
+    color: #000;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--accent-tertiary);
+}
+
+.nav-btn:active {
+    transform: translate(0, 0);
+    box-shadow: none;
+}
+
+.progress-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 6px;
+    background: var(--accent-secondary);
+    width: 0%; /* JS will update this */
+    transition: width 0.3s ease;
+    z-index: 1000;
+}
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="deck-container">
+
+    <!-- Slide 1: Main Title -->
+    <div class="slide-container active" id="slide1">
+        <div style="width: 100%; text-align: left;">
+            <h1>WEB<br>CORE<br>SYSTEMS</h1>
+            <p style="color: var(--accent-secondary); font-size: 24px;">> Structure (HTML) & Motion (CSS)_</p>
+            <p style="color: var(--accent-secondary); font-size: 24px;">> Zenul Aabedeen Khan_</p>
+            <p style="color: var(--accent-secondary); font-size: 24px;">> 24AI062_</p>
+
+            <div style="margin-top: 40px; border-top: 2px dashed #555; padding-top: 10px; width: 50%;">
+                INITIALIZING SEQUENCE...
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Core_Segments -->
+    <div class="slide-container" id="slide2">
+        <h2 class="slide-title">Core_Segments</h2>
+        <div class="two-column">
+            <div>
+                <h3>System Architecture</h3>
+                <p>Every HTML document is split into two critical zones. The brain and the body.</p>
+                <ul style="margin-top: 20px;">
+                    <li><span style="color:var(--accent-secondary)">&lt;HEAD&gt;</span> The Brain. Contains metadata, titles, links to CSS/JS. Invisible to users.</li>
+                    <li><span style="color:var(--accent-secondary)">&lt;BODY&gt;</span> The Physical Form. Contains all visible content (text, images, buttons).</li>
+                </ul>
+            </div>
+            <div class="image-wrapper">
+                <img src="slide2.png" 
+                     onerror="this.onerror=null; this.src='https://placehold.co/800x600?text=Schematic';"
+                     alt="Retro computer schematic blueprint cyan magenta">
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: HTML Intro -->
+    <div class="slide-container" id="slide3">
+        <h2 class="slide-title">The Skeleton</h2>
+        <div class="two-column">
+            <div>
+                <h3>Raw Structure</h3>
+                <p>HTML is the raw concrete. It carries the weight of the web. Without it, CSS is just paint on thin air.</p>
+                <p>Bones don't need to be pretty. They need to be strong.</p>
+            </div>
+            <div class="image-wrapper">
+                <img src="slide3.png" 
+                     onerror="this.onerror=null; this.src='https://placehold.co/800x600?text=Wireframe';"
+                     alt="Digital wireframe structure">
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Semantics -->
+    <div class="slide-container" id="slide4">
+        <h2 class="slide-title">Semantics_</h2>
+        <div class="two-column">
+            <div class="terminal">
+                <span class="terminal-line"><span style="color:var(--accent-error)">// NON-SEMANTIC (BAD)</span></span>
+                <span class="terminal-line">&lt;div class="nav"&gt;Menu&lt;/div&gt;</span>
+                <span class="terminal-line">&lt;div class="footer"&gt;End&lt;/div&gt;</span>
+                <br>
+                <span class="terminal-line"><span style="color:var(--accent-secondary)">// SEMANTIC (GOOD)</span></span>
+                <span class="terminal-line">&lt;nav&gt;Menu&lt;/nav&gt;</span>
+                <span class="terminal-line">&lt;footer&gt;End&lt;/footer&gt;</span>
+            </div>
+            <div>
+                <h3>Speak to the Machine</h3>
+                <p>Semantic HTML conveys meaning to search engines and screen readers. It tells the machine WHAT the content is, not just where it sits.</p>
+                <p style="color: var(--accent-tertiary); margin-top: 20px; border: 1px solid var(--accent-tertiary); padding: 10px;">> A &lt;div&gt; means nothing.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Attributes -->
+    <div class="slide-container" id="slide5">
+        <h2 class="slide-title">Attributes</h2>
+        <div class="two-column">
+            <div class="image-wrapper">
+                <img src="slide5.png" 
+                     onerror="this.onerror=null; this.src='https://placehold.co/800x600?text=Control+Panel';"
+                     alt="Retro futuristic control panel neon">
+            </div>
+            <div>
+                <h3>System Controls</h3>
+                <p>Attributes provide additional information about elements. They are the switches and dials of your HTML tags.</p>
+                <div class="terminal" style="margin-top: 20px; font-size: 18px;">
+                    <span class="terminal-line">&lt;img <span class="attr">src</span>=<span class="val">"logo.png"</span> <span class="attr">alt</span>=<span class="val">"Brand"</span> /&gt;</span>
+                    <span class="terminal-line">&lt;a <span class="attr">href</span>=<span class="val">"/login"</span> <span class="attr">class</span>=<span class="val">"btn"</span>&gt;</span>
+                    <span class="terminal-line">&lt;input <span class="attr">type</span>=<span class="val">"password"</span> <span class="attr">required</span> /&gt;</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Element Types -->
+    <div class="slide-container" id="slide6">
+        <h2 class="slide-title">Element_Types</h2>
+        <div class="tiled-content">
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-cube"></i></div>
+                <h3>Block</h3>
+                <p>Starts on a new line. Consumes full width. Examples: div, p, h1, section, footer.</p>
+            </div>
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-i-cursor"></i></div>
+                <h3>Inline</h3>
+                <p>Flows with text. Takes necessary width. Examples: span, a, strong, em.</p>
+            </div>
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-ban"></i></div>
+                <h3>Void</h3>
+                <p>Self-closing. No content inside. Examples: img, br, input, hr, meta.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Forms -->
+    <div class="slide-container" id="slide7">
+        <h2 class="slide-title">Input_Terminals</h2>
+        <div class="two-column">
+            <div>
+                <h3>User Interaction</h3>
+                <p>Forms are the primary method for collecting user data. Without them, the web is read-only.</p>
+                <ul style="margin-top: 20px;">
+                    <li><span style="color:var(--accent-secondary)">&lt;form&gt;</span>Wrapper for data</li>
+                    <li><span style="color:var(--accent-secondary)">&lt;input&gt;</span>The data entry point</li>
+                    <li><span style="color:var(--accent-secondary)">&lt;label&gt;</span>The descriptor</li>
+                </ul>
+            </div>
+            <div class="terminal">
+                <div style="border: 1px solid #333; padding: 15px; margin-bottom: 10px;">
+                    <span style="color:#AAA">USERNAME:</span> <span style="background:#333; color:#FFF; padding: 0 5px;">admin_</span>
+                </div>
+                <div style="border: 1px solid #333; padding: 15px; margin-bottom: 10px;">
+                    <span style="color:#AAA">PASSWORD:</span> <span style="background:#333; color:#FFF; padding: 0 5px;">********</span>
+                </div>
+                <div style="background: var(--accent-primary); color:#000; padding: 10px; text-align: center; font-weight: bold;">
+                    [ SUBMIT DATA ]
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Section Break -->
+    <div class="slide-container" id="slide8">
+        <div class="section-break">
+            <hr>
+            <h2 style="font-size: 64px; color: #FFF;">PHASE 2: MOTION</h2>
+            <p style="color: var(--accent-tertiary); font-size: 24px;">Initiating Animation Subsystems...</p>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Slide 9: CSS Intro -->
+    <div class="slide-container" id="slide9">
+        <h2 class="slide-title">Why Animation?</h2>
+        <div class="two-column">
+            <div>
+                <h3>Attention & Feedback</h3>
+                <p>Animation is not just decoration. It guides the user's eye, provides feedback on interactions (clicks, hovers), and masks loading times.</p>
+                <ul>
+                    <li><i class="fa-solid fa-caret-right" style="color:var(--accent-primary)"></i> Enhances User Experience</li>
+                    <li><i class="fa-solid fa-caret-right" style="color:var(--accent-primary)"></i> Reduces Cognitive Load</li>
+                    <li><i class="fa-solid fa-caret-right" style="color:var(--accent-primary)"></i> Creates Continuity</li>
+                </ul>
+            </div>
+            <div class="image-wrapper">
+                <img src="slide9.png" 
+                     onerror="this.onerror=null; this.src='https://placehold.co/800x600?text=Motion+Graphics';"
+                     alt="Retro synthwave motion graphics">
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: Keyframes -->
+    <div class="slide-container" id="slide10">
+        <h2 class="slide-title">Keyframes</h2>
+        <div class="two-column">
+            <div class="terminal">
+                <span class="terminal-line">@keyframes <span style="color:var(--accent-secondary)">glitch</span> {</span>
+                <span class="terminal-line">&nbsp;&nbsp;0% { transform: translate(0); }</span>
+                <span class="terminal-line">&nbsp;&nbsp;20% { transform: translate(-2px, 2px); }</span>
+                <span class="terminal-line">&nbsp;&nbsp;40% { transform: translate(-2px, -2px); }</span>
+                <span class="terminal-line">&nbsp;&nbsp;100% { transform: translate(0); }</span>
+                <span class="terminal-line">}</span>
+                <br>
+                <span class="terminal-line">.element {</span>
+                <span class="terminal-line">&nbsp;&nbsp;animation: <span style="color:var(--accent-secondary)">glitch</span> 0.5s infinite;</span>
+                <span class="terminal-line">}</span>
+            </div>
+            <div>
+                <h3>Defining the Sequence</h3>
+                <p>@keyframes allow you to define the intermediate steps in a CSS animation sequence. You control the start (0%), the end (100%), and any waypoints in between.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 11: Methods -->
+    <div class="slide-container" id="slide11">
+        <h2 class="slide-title">Methods</h2>
+        <div class="tiled-content">
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-bolt"></i></div>
+                <h3>Transitions</h3>
+                <p>Simple change from State A to State B. Triggered by hover or focus. Efficient and easy.</p>
+            </div>
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-film"></i></div>
+                <h3>Animations</h3>
+                <p>Complex sequences. Can loop infinitely. Does not require a trigger (runs on load).</p>
+            </div>
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-arrows-spin"></i></div>
+                <h3>Transforms</h3>
+                <p>Moving, scaling, rotating elements. Hardware accelerated for smooth 60fps performance.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 12: Performance -->
+    <div class="slide-container full-bg-image" id="slide12" style="background-image: url('slide12.png');">
+        <div class="overlay-box">
+            <h2 style="font-size: 60px; color: #FFF; margin: 0;">Advice</h2>
+            <p style="font-size: 24px;">Experience is just the name we give our mistakes.</p>
+        </div>
+    </div>
+
+    <!-- Slide 13: End -->
+    <div class="slide-container" id="slide13">
+        <div style="text-align: center; width: 100%;">
+            <h1 style="font-size: 100px; margin-bottom: 40px;">END OF LINE_</h1>
+            <p style="color: var(--accent-primary); font-size: 32px;">[ &lt;/body&gt; &lt;/html&gt; ]</p>
+            <div style="margin-top: 50px; color: #555;">
+                > SYSTEM HALTED.
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Navigation Controls -->
+<div class="nav-controls">
+    <button class="nav-btn" onclick="prevSlide()">[ PREV ]</button>
+    <button class="nav-btn" onclick="nextSlide()">[ NEXT ]</button>
+</div>
+
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide-container');
+    const progressBar = document.getElementById('progressBar');
+
+    function showSlide(index) {
+        // Handle wrapping
+        if (index >= slides.length) currentSlide = 0;
+        else if (index < 0) currentSlide = slides.length - 1;
+        else currentSlide = index;
+
+        // Update UI
+        slides.forEach((slide, i) => {
+            slide.classList.remove('active');
+            if (i === currentSlide) {
+                slide.classList.add('active');
+            }
+        });
+
+        // Update Progress Bar
+        const progress = ((currentSlide + 1) / slides.length) * 100;
+        progressBar.style.width = `${progress}%`;
+    }
+
+    function nextSlide() { showSlide(currentSlide + 1); }
+    function prevSlide() { showSlide(currentSlide - 1); }
+
+    // Keyboard Navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+        if (e.key === 'ArrowLeft') prevSlide();
+    });
+
+    // Initialize
+    showSlide(0);
+</script>
+
+</body>
+</html>
+```
